@@ -41,3 +41,12 @@ A web-based hotel reservation system that allows users to browse available rooms
 
 ```bash
 git clone https://github.com/deeksha-1011/Hotel-Reservation-System.git
+
+2. Open the project folder:
+cd Hotel-Reservation-System
+
+3. Install the required dependencies:
+npm install
+
+4. Start the application according to the project configuration.
+
