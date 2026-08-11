@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rooms - SkyStay Hotel</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .room-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .room-image {
+      width: 100%;
+      height: 200px;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .room-details {
+      padding: 1.5rem;
+    }
+    .room-type {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    .room-description {
+      color: var(--neutral-600);
+      margin-bottom: 1rem;
+    }
+    .features-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .feature-tag {
+      background: var(--neutral-100);
+      padding: 0.25rem 0.75rem;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      color: var(--neutral-700);
+    }
+    .room-price {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .booking-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      width: 90%;
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 8px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .close-modal {
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--neutral-300);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">SkyStay</div>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="rooms.html" class="nav-link active">Rooms</a></li>
+          <li id="my-bookings-link" class="hidden"><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+          <li id="login-link"><a href="login.html" class="nav-link">Login</a></li>
+          <li id="signup-link"><a href="signup.html" class="nav-link">Sign Up</a></li>
+          <li id="logout-link" class="hidden"><a href="#" class="nav-link">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="rooms">
+      <div class="container">
+        <h1>Our Rooms</h1>
+        <div class="rooms-grid" id="rooms-container">
+          <!-- Rooms will be loaded here dynamically -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="booking-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Book Room</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <form id="booking-form">
+        <input type="hidden" id="room-id">
+        <div class="form-group">
+          <label for="check-in">Check-in Date</label>
+          <input type="date" id="check-in" required min="">
+        </div>
+        <div class="form-group">
+          <label for="check-out">Check-out Date</label>
+          <input type="date" id="check-out" required min="">
+        </div>
+        <div class="form-group">
+          <label for="guests">Number of Guests</label>
+          <input type="number" id="guests" required min="1" max="4">
+        </div>
+        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateNavigation();
+      loadRooms();
+      setupBookingModal();
+    });
+
+    // Set minimum dates for check-in and check-out
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('check-in').min = today;
+    document.getElementById('check-out').min = today;
+
+    async function loadRooms() {
+      try {
+        const response = await fetch('http://localhost:3000/api/rooms');
+        if (!response.ok) throw new Error('Failed to fetch rooms');
+        
+        const rooms = await response.json();
+        displayRooms(rooms);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load rooms. Please try again later.');
+      }
+    }
+
+    function displayRooms(rooms) {
+      const container = document.getElementById('rooms-container');
+      container.innerHTML = rooms.map(room => `
+        <div class="room-card">
+          <div class="room-image">Room ${room.room_number}</div>
+          <div class="room-details">
+            <h3 class="room-type">${room.type}</h3>
+            <p class="room-description">${room.description || 'A comfortable room with modern amenities.'}</p>
+            <div class="features-list">
+              <span class="feature-tag">WiFi</span>
+              <span class="feature-tag">AC</span>
+              <span class="feature-tag">TV</span>
+            </div>
+            <p class="room-price">$${room.price} per night</p>
+            <button class="btn btn-primary" onclick="openBookingModal(${room.id}, '${room.type}', ${room.price})">Book Now</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupBookingModal() {
+      const modal = document.getElementById('booking-modal');
+      const closeBtn = document.querySelector('.close-modal');
+      const form = document.getElementById('booking-form');
+
+      closeBtn.onclick = function() {
+        modal.style.display = 'none';
+      }
+
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
+      }
+
+      form.onsubmit = async function(e) {
+        e.preventDefault();
+        
+        if (!isLoggedIn()) {
+          alert('Please log in to book a room');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const roomId = document.getElementById('room-id').value;
+        const checkIn = document.getElementById('check-in').value;
+        const checkOut = document.getElementById('check-out').value;
+        const guests = document.getElementById('guests').value;
+
+        try {
+          const response = await fetch('http://localhost:3000/api/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              room_id: roomId,
+              check_in: checkIn,
+              check_out: checkOut,
+              guests: guests
+            })
+          });
+
+          if (!response.ok) throw new Error('Booking failed');
+
+          const result = await response.json();
+          alert('Booking successful!');
+          modal.style.display = 'none';
+          window.location.href = 'my-bookings.html';
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Failed to create booking. Please try again.');
+        }
+      }
+    }
+
+    function openBookingModal(roomId, roomType, price) {
+      if (!isLoggedIn()) {
+        alert('Please log in to book a room');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const modal = document.getElementById('booking-modal');
+      document.getElementById('room-id').value = roomId;
+      document.querySelector('.modal-header h2').textContent = `Book ${roomType}`;
+      modal.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

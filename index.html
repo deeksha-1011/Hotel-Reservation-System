@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyStay Hotel</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">SkyStay</div>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="rooms.html" class="nav-link">Rooms</a></li>
+          <li id="my-bookings-link" class="hidden"><a href="my-bookings.html" class="nav-link">My Bookings</a></li>
+          <li id="login-link"><a href="login.html" class="nav-link">Login</a></li>
+          <li id="signup-link"><a href="signup.html" class="nav-link">Sign Up</a></li>
+          <li id="logout-link" class="hidden"><a href="#" class="nav-link">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Welcome to SkyStay Hotel</h1>
+        <p>Experience comfort and luxury at affordable prices</p>
+        <a href="rooms.html" class="btn btn-primary">View Rooms</a>
+      </div>
+    </section>
+
+    <section class="about-us">
+      <div class="container">
+        <h2>About Us</h2>
+        <div class="about-content">
+          <div class="about-text">
+            <p>Welcome to SkyStay Hotel, where luxury meets comfort in perfect harmony. Established in 2020, we have been dedicated to providing our guests with an exceptional hospitality experience that combines modern amenities with personalized service.</p>
+            <p>Our hotel features:</p>
+            <ul>
+              <li>Stunning panoramic city views</li>
+              <li>24/7 concierge service</li>
+              <li>Fine dining restaurant</li>
+              <li>State-of-the-art fitness center</li>
+              <li>Luxurious spa facilities</li>
+            </ul>
+            <p>At SkyStay, we believe in creating memorable stays for our guests, whether you're here for business or leisure. Our dedicated team is committed to ensuring your comfort and satisfaction throughout your stay.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateNavigation();
+    });
+  </script>
+</body>
+</html>

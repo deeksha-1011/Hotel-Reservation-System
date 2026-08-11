@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings - SkyStay Hotel</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .bookings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+    .booking-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+    }
+    .status-pending {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+    .status-confirmed {
+      color: #10b981;
+      font-weight: 600;
+    }
+    .status-cancelled {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    .booking-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .btn-confirm {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-cancel {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-confirm:disabled,
+    .btn-cancel:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">SkyStay</div>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="rooms.html" class="nav-link">Rooms</a></li>
+          <li><a href="my-bookings.html" class="nav-link active">My Bookings</a></li>
+          <li id="login-link" class="hidden"><a href="login.html" class="nav-link">Login</a></li>
+          <li id="signup-link" class="hidden"><a href="signup.html" class="nav-link">Sign Up</a></li>
+          <li id="logout-link"><a href="#" class="nav-link">Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="bookings">
+      <div class="container">
+        <h1>My Bookings</h1>
+        <div id="bookings-list" class="bookings-grid">
+          <!-- Bookings will be loaded here dynamically -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateNavigation();
+      loadBookings();
+    });
+
+    async function loadBookings() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/api/bookings', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch bookings');
+        }
+
+        const bookings = await response.json();
+        displayBookings(bookings);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load bookings. Please try again later.');
+      }
+    }
+
+    function displayBookings(bookings) {
+      const bookingsList = document.getElementById('bookings-list');
+      if (bookings.length === 0) {
+        bookingsList.innerHTML = '<p>No bookings found.</p>';
+        return;
+      }
+
+      console.log('Bookings data:', bookings);
+
+      bookingsList.innerHTML = bookings.map(booking => {
+        console.log('Processing booking:', booking);
+        return `
+          <div class="booking-card">
+            <h3>Room ${booking.room_number}</h3>
+            <p><strong>Booking ID:</strong> ${booking.id}</p>
+            <p><strong>User ID:</strong> ${booking.user_id}</p>
+            <p><strong>Room ID:</strong> ${booking.room_id}</p>
+            <p><strong>Username:</strong> ${booking.username}</p>
+            <p><strong>Email:</strong> ${booking.email}</p>
+            <p><strong>Type:</strong> ${booking.type}</p>
+            <p><strong>Check-in:</strong> ${new Date(booking.check_in).toLocaleDateString()}</p>
+            <p><strong>Check-out:</strong> ${new Date(booking.check_out).toLocaleDateString()}</p>
+            <p><strong>Status:</strong> <span class="status-${booking.status.toLowerCase()}">${booking.status}</span></p>
+            <p><strong>Price:</strong> $${booking.price}</p>
+            <p><strong>Booked on:</strong> ${new Date(booking.created_at).toLocaleString()}</p>
+            <div class="booking-actions">
+              ${booking.status === 'pending' ? `
+                <button class="btn-confirm" onclick="updateBookingStatus(${booking.id}, 'confirmed')">Confirm</button>
+                <button class="btn-cancel" onclick="updateBookingStatus(${booking.id}, 'cancelled')">Cancel</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateBookingStatus(bookingId, status) {
+      try {
+        console.log('Updating booking:', { bookingId, status });
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const url = `http://localhost:3000/api/bookings/${bookingId}/status`;
+        console.log('Request URL:', url);
+
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Server error:', errorData);
+          throw new Error(errorData.error || 'Failed to update booking status');
+        }
+
+        // Reload bookings to show updated status
+        loadBookings();
+        alert(`Booking ${status} successfully!`);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update booking status. Please try again later.');
+      }
+    }
+  </script>
+</body>
+</html>

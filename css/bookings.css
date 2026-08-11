@@ -1,0 +1,112 @@
+/* Bookings Styles */
+.bookings-section {
+  padding: var(--space-8) 0 var(--space-16);
+  min-height: calc(100vh - 140px);
+}
+
+.bookings-section h1 {
+  text-align: center;
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-8);
+  color: var(--neutral-800);
+}
+
+.bookings-list {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.booking-card {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  margin-bottom: var(--space-6);
+  overflow: hidden;
+}
+
+.booking-header {
+  padding: var(--space-4);
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.booking-id {
+  font-weight: 600;
+}
+
+.booking-status {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-confirmed {
+  background-color: var(--success);
+  color: white;
+}
+
+.status-completed {
+  background-color: var(--neutral-500);
+  color: white;
+}
+
+.status-cancelled {
+  background-color: var(--error);
+  color: white;
+}
+
+.booking-content {
+  padding: var(--space-4);
+}
+
+.booking-room-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--neutral-800);
+}
+
+.booking-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.booking-detail-group h4 {
+  font-size: var(--text-sm);
+  color: var(--neutral-500);
+  margin-bottom: var(--space-1);
+}
+
+.booking-detail-value {
+  font-weight: 500;
+  color: var(--neutral-800);
+}
+
+.booking-price {
+  text-align: right;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--neutral-200);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--neutral-500);
+}
+
+.booking-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
